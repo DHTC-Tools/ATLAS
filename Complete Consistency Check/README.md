@@ -10,7 +10,7 @@ Rucio, generic disk, and dCache (PNFS/Chimera).  Support for LFC has been deprec
 
 There is currently a known limitation in Rucio support, in the case where a file is in the rucio file catalog but not in dataset catalog.  We do not currently have a method to detect this type of inconsistency at the site level.  There is a procedure initiated by central operations to detect files in this state.  Please contact DDM support at `atlas-dq2-ops@cern.ch ` if you need this check run for your site.
 
-`ccc_pnfs_rucio.py` will download the list of datasets listed in DQ2 for a site, compute
+`ccc_pnfs_rucio.py` will download the list of datasets listed in Rucio for a site, compute
 Rucio paths for each file in the datasets, and check that against what is in PNFS. It will 
 additionally check PNFS against disk. A report is generated in the output directory with a 
 summary of discrepancies found.
