@@ -26,7 +26,7 @@ if you are interested in a version of ccc_generic.py that supports Rucio.
 How to run
 ----------
 
-Download ccc_pnfs_rucio.py and ccc_config.py.  Change the values in ccc_config.py to reflect your installation. If you have used a previous version of a CCC script, note that the format for DQ2 endpoints has changed.
+Download `ccc_pnfs_rucio.py` and `ccc_config.py`.  Change the values in `ccc_config.py` to reflect your installation. If you have used a previous version of a CCC script, note that the format for DQ2 endpoints has changed.
 
 Before attempting to run the script, CCC requires the dq2 clients to be set up. See `ccc_wrapper.sh` for an example on how to set this up on a machine with CVMFS.  By default CCC also requires passwordless ssh access to the PNFS server and to each of the dCache pool servers.  If using the `-np` (no pool) option, ssh access to the pool servers is not neccessary.  If using the `-p pnfs_file` option to provind a pnfs dump file, ssh access to the PNFS server is not neccessary.
 
@@ -62,7 +62,7 @@ filled out the run time of the script will improve.
 A text file `/tmp/ccc.lock` is created to make sure only one copy of ccc runs at a time.
 
 An html report named `ccc-DATE-TIME.html` will be created in the output directory, along with text files
-for each of the file states detected. For instance, if there are pnfs orphans, the file pnfs-orphans-DATE-TIME
+for each of the file states detected. For instance, if there are pnfs orphans, the file `pnfs-orphans-DATE-TIME`
 is created.
 
 Concepts and terminology
