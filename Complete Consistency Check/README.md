@@ -69,7 +69,7 @@ Concepts and terminology
 ------------------------
 
 When the storage catalog systems are compared they are organized in a heirarchy, from highest to lowest
-level, that being closest to physical disk.  In order these are DQ2 -> Rucio File Catalog ->
+level, that being closest to physical disk.  In order these are DQ2 (Rucio Dataset Catalog) -> Rucio File Catalog ->
 PNFS -> filesystem.  
 
 GHOST: A file that is present in a higher level storage catalog, but not in a lower one or on disk.
