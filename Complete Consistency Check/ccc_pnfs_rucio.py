@@ -282,9 +282,9 @@ if check_dq2:
         from dq2.clientapi.DQ2 import DQ2
         from dq2.common.DQConstants import DatasetState
         dq2 = DQ2()
-    except:
-        msg = """Cannot import dq2.clientapi, not checking dq2
-Finished at %s""" % time.ctime()
+    except Exception, e:
+        msg = 'Error importing dq2.clientapi:\n| ' + \
+			str(e).replace('\n', '\n| ') + '\nFinished at %s' % time.ctime()
         print >> main_page, msg
         print msg
         sys.exit(0)
