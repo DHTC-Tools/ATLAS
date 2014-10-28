@@ -15,7 +15,7 @@ Rucio paths for each file in the datasets, and check that against what is in PNF
 additionally check PNFS against disk. A report is generated in the output directory with a 
 summary of discrepancies found.
 
-`ccc_generic.py` checks a list of datasets in DQ2 against files on a generic mounted disk. It
+`ccc_generic.py` checks a list of datasets listed in Rucio for a site, against files on a generic mounted disk. It
 is as of this writing not updated to compute Rucio paths.  Please contact support@mwt2.org
 if you are interested in a version of ccc_generic.py that supports Rucio.
 
