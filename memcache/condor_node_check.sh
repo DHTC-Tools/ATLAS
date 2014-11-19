@@ -21,31 +21,46 @@
 #  $Id: condor_node_check.sh,v 1.6 2011/08/31 19:25:16 sarah Exp $ 
 #
 
-SCRATCHFILE=/scratch/node_check.testfile
-#MEMCLIENT=/usr/local/bin/memclient.py
-#MEMCLIENT=/share/local/bin/memclient.py
-MEMCLIENT=/opt/condor/local/bin/memclient.py
+echo "node_check run $( date ) by $USER" >> /var/log/condor_node_check.log
+
+MEMCLIENT=/usr/local/bin/memclient.py
+
 HOST=$( hostname -s )
+SCRATCHFILE=/scratch/node_check.testfile
 ERRFILE=/tmp/node_check.err
+
 /bin/rm -f $ERRFILE >& /dev/null
+
 
 setOffline(){
    msg=$1
-   $MEMCLIENT put  $HOST.status offline
-   $MEMCLIENT put  $HOST.message $msg
+   timestamp=$(date +%s)
+   $MEMCLIENT put  $HOST.status    offline
+   $MEMCLIENT put  $HOST.message   "$msg"
+   $MEMCLIENT put  $HOST.timestamp $timestamp
    echo "NodeOnline = False"
    echo "NodeOnlineReason = '$msg'"
 }
-setOnline(){
-   $MEMCLIENT put  $HOST.status online
-   $MEMCLIENT put  $HOST.message ''
+
+setMidline(){
+   msg=$1
+   timestamp=$(date +%s)
+   $MEMCLIENT put  $HOST.status    midline
+   $MEMCLIENT put  $HOST.message   "$msg"
+   $MEMCLIENT put  $HOST.timestamp $timestamp
    echo "NodeOnline = True"
+   echo "NodeMidline = True"
+   echo "NodeOnlineReason = '$msg'"
 }
 
-
-#########
-# TESTS #
-#########
+setOnline(){
+   timestamp=$(date +%s)
+   $MEMCLIENT put  $HOST.status    online
+   $MEMCLIENT put  $HOST.message   ''
+   $MEMCLIENT put  $HOST.timestamp $timestamp
+   echo "NodeOnline = True"
+   echo "NodeMidline = False"
+}
 
 
 # Test if the node has been set offline manually
@@ -59,18 +74,11 @@ if [ $MANUALSTATUS == 'offline' ]; then
 fi
 
 
-# If the node is not marked online in memcached, consider us offline
-# This could because by several reasons
-#
-# 1) New node
-# 2) Networking problems - cannot reach memcached
-# 3) Memcached down or rebooted
 
+#########
+# TESTS #
+#########
 
-if [ $MANUALSTATUS != 'online' ]; then
-	setOffline "Automatic offline: node not marked online in memcache!"
-	exit 1
-fi
 
 # Able to write to /tmp ?
 msg=`touch $ERRFILE 2>&1`
@@ -96,11 +104,18 @@ fi
 
 /bin/rm -f $ERRFILE
 
-# 5GB free in /scratch ?
+# 5000 free inodes in /scratch ?
+avail=$(df -iP /scratch | tail -1 | awk '{print $4;}')
+if (( avail < 5000 )); then
+    setOffline "ERROR only $avail inodes free in /scratch"
+    exit 2
+fi
+
+# 10GB free in /scratch ?
 avail=$(df -P -B1G /scratch | tail -1 | awk '{print $4;}')
 #  is there a better way to parse the output of df,
 #  without using "tail" and "awk"?
-if (( avail < 5 )); then
+if (( avail < 10 )); then
     setOffline "ERROR only $avail GB free in /scratch"
     exit 2
 fi
@@ -114,11 +129,6 @@ if (( avail < 5 )); then
     exit 8
 fi
 
-# NFS mount /osg sane?
-#if [[ ! -e /osg/.node_check.DONOTDELETE ]] ; then
-#    setOffline "ERROR cannot access /osg"
-#    exit 3
-#fi
 
 # NFS mount /share/certificates sane and CERN cert available:
 if [[ ! -e /etc/grid-security/certificates/1d879c6c.0 ]] ; then
@@ -126,35 +136,23 @@ if [[ ! -e /etc/grid-security/certificates/1d879c6c.0 ]] ; then
 	exit 7
 fi
 
-# Python version
-#  Skip this for now
 
-# USATLAS home dirs NFS mount sane?
+#  Home dirs NFS mount sane?
 
-#if [[ ! -e ~usatlas1/.node_check.DONOTDELETE ]] ; then
-if [[ ! -e ~usatlas1 ]] ; then
-    setOffline  "ERROR cannot access ~usatlas1"
+if [[ ! -e ~osg ]] ; then
+    setOffline  "ERROR cannot access VO user ~osg"
     exit 4
 fi
 
-# Other home dirs NFS mount sane?
-
-#if [[ ! -e /home/.node_check.DONOTDELETE ]] ; then
-#    setOffline "ERROR cannot access /home"
-#    exit 5
-#fi
-
-# CVMFS mount sane?
-
-if [[ ! -e /cvmfs/atlas.cern.ch/repo/sw/software ]] ; then
-    setOffline "ERROR cannot access /cvmfs/atlas.cern.ch/repo/sw/software"
-    exit 5
+if [[ ! -e ~uc3 ]] ; then
+    setOffline  "ERROR cannot access VO user ~uc3"
+    exit 4
 fi
 
-if [[ ! -e /cvmfs/atlas-condb.cern.ch/repo/conditions ]] ; then
-    setOffline "ERROR cannot access /cvmfs/atlas.cern.ch/repo/conditions"
-    exit 5
-fi
+
+
+# CVMFS mounts common to all jobs
+
 
 if [[ ! -e /share/osg/mwt2/app ]] ; then
     setOffline "ERROR cannot access /share/osg/mwt2/app"
@@ -172,20 +170,78 @@ if [[ ! -e /share/wn-client ]] ; then
 fi
 
 
-# PNFS mount OK?
-d=uchicago.edu
+# If the node is online for Atlas jobs, check those items that are Atlas only
+# If any tests fail, put the node into midline
 
-if ! grep -q /pnfs/$d /proc/mounts ; then
-    setOffline "ERROR /pnfs/$d not mounted"
-    exit 6
+if [[ $MANUALSTATUS == "online" ]]; then
+
+  # USATLAS home dirs NFS mount sane?
+
+  if [[ ! -e ~usatlas1 ]] ; then
+      setMidline  "ERROR cannot access ~usatlas1"
+      exit 4
+  fi
+
+  # CVMFS mount sane?
+
+  if [[ ! -e /cvmfs/atlas.cern.ch/repo/sw/software ]] ; then
+      setMidline "ERROR cannot access /cvmfs/atlas.cern.ch/repo/sw/software"
+      exit 5
+  fi
+
+  if [[ ! -e /cvmfs/atlas-condb.cern.ch/repo/conditions ]] ; then
+      setMidline "ERROR cannot access /cvmfs/atlas.cern.ch/repo/conditions"
+      exit 5
+  fi
+
+
+  # PNFS mount OK?
+
+  if ! grep -q /pnfs /proc/mounts ; then
+      setMidline "ERROR /pnfs not mounted"
+      exit 6
+  fi
+
+  p=$( grep /pnfs /proc/mounts )
+  if ! ( echo $p | grep -q noac ); then
+      setMidline "ERROR /pnfs mounted without noac"
+      exit 6
+  fi
 fi
 
-p=$( grep /pnfs/$d /proc/mounts )
-if ! ( echo $p | grep -q noac ); then
-    setOffline "ERROR /pnfs/$d mounted without noac"
-    exit 7
-fi
+# We have passed all tests
 
+# If the node is not marked online or midline in memcached, consider us offline
+#
+# This could because by several reasons
+#
+# 1) New node
+# 2) Networking problems - cannot reach memcached
+# 3) Memcached down or rebooted
 
-setOnline
-exit 0
+case $MANUALSTATUS in
+
+(online)
+
+  setOnline
+  exit 0
+  ;;
+
+(midline)
+
+  MANUALREASON=$( $MEMCLIENT get $HOST.manualreason )
+# setMidline "Manual midline: $MANUALREASON"
+  setMidline ""
+  exit 0
+  ;;
+
+(*)
+
+  setOffline "Automatic offline: node not marked online or midline in memcache!"
+  exit 1
+  ;;
+
+esac
+
+setOffline "Automatic offline: Internal condor_node_offline error"
+exit 1
