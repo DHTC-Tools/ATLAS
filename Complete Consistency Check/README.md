@@ -15,9 +15,7 @@ Rucio paths for each file in the datasets, and check that against what is in PNF
 additionally check PNFS against disk. A report is generated in the output directory with a 
 summary of discrepancies found.
 
-`ccc_generic.py` checks a list of datasets listed in Rucio for a site, against files on a generic mounted disk. It
-is as of this writing not updated to compute Rucio paths.  Please contact support@mwt2.org
-if you are interested in a version of ccc_generic.py that supports Rucio.
+`ccc_generic.py` checks a list of datasets listed in Rucio for a site, against files on a generic mounted disk. 
 
 `ccc_pnfs.py` is a deprecated script that compares DQ2, LFC, and PNFS.  It is replaced by
 `ccc_pnfs_rucio.py`.
@@ -25,6 +23,24 @@ if you are interested in a version of ccc_generic.py that supports Rucio.
 
 How to run
 ----------
+
+GENERIC:
+--------
+Download `ccc_generic.py`.  Before attempting to run the script, CCC requires the dq2 clients to be set up. See `ccc_wrapper.sh` for an example on how to set this up on a machine with CVMFS. 
+```
+Usage: ./ccc_generic.py [-o output_dir] [-m min_age] [-c storage_dump_command | -f storage_dump_file ]  storage_root site
+   storage_root: Root directory of your storage 
+   site: Site name as registered in AGIS 
+   -m min_age: don't flag files newer than this (default=2 hours)
+         use 's' for seconds(default), 'm'=minutes, 'h'=hours, 'd'=days
+   -o specifies directory for (html) output, default is working directory
+   -c command that outputs the list of files in your storage 
+   -f file that contains a list of the files in  your storage 
+   If neither -c nor  -f is used, the command will default to using the find command 
+   ```
+
+PNFS:
+-----
 
 Download `ccc_pnfs_rucio.py` and `ccc_config.py`.  Change the values in `ccc_config.py` to reflect your installation. If you have used a previous version of a CCC script, note that the format for DQ2 endpoints has changed.
 
@@ -42,6 +58,9 @@ Usage: ./ccc_pnfs_rucio.py [-o output_dir] [-p pnfs_file] [-l lfc_file] [-np] [-
    -np (no pool) skips checking of /dcache/pool on pool nodes
    -nd (no dq2) skips checking of registered dq2 datasets
 ```
+
+BOTH:
+-----
 
 CCC can take up to a day to run, depending on the size of the site.  It is recommended to run the command in an interactive screen session, or non-interactively using the `nohup` command. Note that `nohup` requires both stdout and stderr to be directed to a file. If you do not redirect them on the command line, these outputs will be sent to a file `nohup.out` in the current working directory.
 
