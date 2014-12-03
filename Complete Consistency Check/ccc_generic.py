@@ -2,7 +2,7 @@
 
 
 # ccc_generic.py: Complete Consistency Check
-#  Consistency check between Storage and DQ2
+#  Consistency check between Storage and Rucio
 
 import sys, os, fcntl, stat, socket, time, re, marshal, pprint, hashlib
 import fcntl, errno
@@ -208,7 +208,7 @@ if check_dq2:
         from dq2.common.DQConstants import DatasetState
         dq2 = DQ2()
     except:
-        msg = """Cannot import dq2.clientapi, not checking dq2
+        msg = """Cannot import dq2.clientapi, no valid proxy, or RUCIO_ACCOUNT env variable not set. not checking dq2
 Finished at %s""" % time.ctime()
         print >> main_page, msg
         print msg
