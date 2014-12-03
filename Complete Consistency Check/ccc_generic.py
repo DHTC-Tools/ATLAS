@@ -50,7 +50,7 @@ def Usage(progname):
     print "   -o specifies directory for (html) output, default is working directory"
     print "   -c command that outputs the list of files in your storage "
     print "   -f file that contains a list of the files in  your storage "
-    print "   If neither -c nor  -f is used, the command will default to ", storage_dump
+    print "   If neither -c nor  -f is used, the command will default to using the find command "
 
 if "pychecker" in sys.argv[0]:     
     args = sys.argv[2:] 
