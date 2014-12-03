@@ -74,7 +74,7 @@ PNFS -> filesystem.
 
 GHOST: A file that is present in a higher level storage catalog, but not in a lower one or on disk.
 Ghost files often cause job failures when a job runs at the site and fails to fetch the missing input
-file.
+file.  Ghost files should be reported via Jira ticket to the DDM OPS team.  https://its.cern.ch/jira/browse/ATLDDMOPS/
 
 ORPHAN: A file that is missing in the higher level storage catalog, but is present in the lower one or
 on disk.  Orphans do not cause job failures.  They are typically 'dark data', and may need to be
@@ -82,11 +82,11 @@ removed manually.
 
 DAMAGED DATASET: A dataset that is listed as haing a complete replica at the site, but lower level
 catalogs or disk show missing files.  Damaged datasets may cause job failures, for the same reason
-as ghost files.
+as ghost files.  The missing files should be reported via Jira ticket to the DDM OPS team.  https://its.cern.ch/jira/browse/ATLDDMOPS/
 
 MISSING DATASET: A dataset that is listed as haing a complete replica at the site, but lower level
 catalogs or disk show all files are missing.  Missing datasets may cause job failures, for the same reason
-as ghost files.
+as ghost files. The missing files should be reported via Jira ticket to the DDM OPS team.  https://its.cern.ch/jira/browse/ATLDDMOPS/
 
 INCOMPLETE DATASET: A dataset is listed as having a incomplete replica at the site, and the lower
 level catalog and file system confirm that.  These are not a problem. 
