@@ -44,7 +44,7 @@ PNFS:
 
 Download `ccc_pnfs_rucio.py` and `ccc_config.py`.  Change the values in `ccc_config.py` to reflect your installation. If you have used a previous version of a CCC script, note that the format for DQ2 endpoints has changed.
 
-Before attempting to run the script, CCC requires the dq2 clients to be set up, the `RUCIO_ACCOUNT` environment variable set, and a valid proxy. See `ccc_wrapper.sh` for an example on how to set this up on a machine with CVMFS.  By default CCC also requires passwordless ssh access to the PNFS server, the ability to stat files in the pnfs filesystem, and passwordless ssh access to each of the dCache pool servers.  If using the `-np` (no pool) option, ssh access to the pool servers is not neccessary.  If using the `-p pnfs_file` option to provind a pnfs dump file, ssh access to the PNFS server is not neccessary.
+Before attempting to run the script, CCC requires the dq2 clients to be set up, the `RUCIO_ACCOUNT` environment variable set, and a valid proxy. See `ccc_wrapper.sh` for an example on how to set this up on a machine with CVMFS.  By default CCC also requires passwordless ssh access to the PNFS server, passwordless access to the dCache database, the ability to stat files in the pnfs filesystem, and passwordless ssh access to each of the dCache pool servers.  If using the `-np` (no pool) option, ssh access to the pool servers is not neccessary.  If using the `-p pnfs_file` option to provind a pnfs dump file, ssh access to the PNFS server is not neccessary.
 
 ```
 Usage: ./ccc_pnfs_rucio.py [-o output_dir] [-p pnfs_file] [-l lfc_file] [-np] [-nd] [-nl]
